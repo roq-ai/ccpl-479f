@@ -1,0 +1,109 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["clientExtensions", "postgresqlExtensions"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  extensions      = [pgcrypto]
+}
+
+model branch {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at  DateTime @default(now()) @db.Timestamp(6)
+  updated_at  DateTime @default(now()) @db.Timestamp(6)
+  address     String?  @db.VarChar(255)
+  company_id  String?  @db.Uuid
+  brnach_head String?  @db.VarChar(255)
+  company     company? @relation(fields: [company_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model company {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  description String?  @db.VarChar(255)
+  image       String?  @db.VarChar(255)
+  name        String   @db.VarChar(255)
+  created_at  DateTime @default(now()) @db.Timestamp(6)
+  updated_at  DateTime @default(now()) @db.Timestamp(6)
+  user_id     String   @db.Uuid
+  tenant_id   String   @db.VarChar(255)
+  branch      branch[]
+  user        user     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model company_info {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at      DateTime @default(now()) @db.Timestamp(6)
+  updated_at      DateTime @default(now()) @db.Timestamp(6)
+  company_history String?
+}
+
+model contact_form {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at     DateTime @default(now()) @db.Timestamp(6)
+  updated_at     DateTime @default(now()) @db.Timestamp(6)
+  email_id       String?  @db.VarChar(255)
+  mobile_number  String?  @db.VarChar(255)
+  name           String?  @db.VarChar(255)
+  company_name   String?  @db.VarChar(255)
+  contact_reason String?  @db.VarChar(255)
+}
+
+model product {
+  id                     String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at             DateTime          @default(now()) @db.Timestamp(6)
+  updated_at             DateTime          @default(now()) @db.Timestamp(6)
+  product_description    String?
+  product_manager        String?           @db.VarChar(255)
+  product_manager_mobile String?           @db.VarChar(255)
+  product_details        product_details[]
+}
+
+model product_details {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at      DateTime @default(now()) @db.Timestamp(6)
+  updated_at      DateTime @default(now()) @db.Timestamp(6)
+  product_summary String?
+  product_id      String?  @db.Uuid
+  product         product? @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model product_image {
+  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at        DateTime @default(now()) @db.Timestamp(6)
+  updated_at        DateTime @default(now()) @db.Timestamp(6)
+  image_description String?
+  image_path        String?  @db.VarChar(255)
+}
+
+model product_rating {
+  id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at         DateTime @default(now()) @db.Timestamp(6)
+  updated_at         DateTime @default(now()) @db.Timestamp(6)
+  rating_comment     String?
+  rating_given_by    String?  @db.VarChar(255)
+  rating_given_email String?  @db.VarChar(255)
+}
+
+model testimonial {
+  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  created_at        DateTime @default(now()) @db.Timestamp(6)
+  updated_at        DateTime @default(now()) @db.Timestamp(6)
+  rating            Int
+  client_image      String?  @db.VarChar(255)
+  client_name       String?  @db.VarChar(255)
+  client_profession String?  @db.VarChar(255)
+}
+
+model user {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email       String    @unique @db.VarChar(255)
+  firstName   String?   @db.VarChar(255)
+  lastName    String?   @db.VarChar(255)
+  roq_user_id String    @db.VarChar(255)
+  tenant_id   String    @db.VarChar(255)
+  created_at  DateTime  @default(now()) @db.Timestamp(6)
+  updated_at  DateTime  @default(now()) @db.Timestamp(6)
+  company     company[]
+}
